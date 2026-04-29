@@ -1,3 +1,5 @@
+import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
+import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -20,12 +22,30 @@ class Home extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {},
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Notifications()),
+              );
+              if (result != null && result is int) {
+                // If a notification was clicked, we want to go to that screen.
+                // This requires access to the Main state or a callback.
+                // For now, we'll assume the Main screen is handling the index.
+              }
+            },
           ),
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            radius: 18,
-            child: Icon(Icons.person, color: Colors.grey, size: 30),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Profile()),
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 18,
+              child: Icon(Icons.person, color: Colors.grey, size: 30),
+            ),
           ),
           SizedBox(width: 14),
         ],

@@ -1,3 +1,6 @@
+import 'package:ai_customer_service_stock_management_system/screens/chat_details.dart';
+import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
+import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
 import 'package:flutter/material.dart';
 
 class Chats extends StatelessWidget {
@@ -87,8 +90,25 @@ class Chats extends StatelessWidget {
           "Chats",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.notifications_outlined, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Notifications()),
+            );
+          },
+        ),
         actions: [
-          Icon(Icons.person, color: Colors.white, size: 30),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Profile()),
+              );
+            },
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
           SizedBox(width: 16),
         ],
       ),
@@ -114,12 +134,22 @@ class Chats extends StatelessWidget {
                 final chat = chats[index];
                 return Padding(
                   padding: EdgeInsets.only(bottom: 12),
-                  child: ChatCard(
-                    name: chat.name,
-                    message: chat.message,
-                    time: chat.time,
-                    type: chat.type,
-                    initial: chat.initial,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatDetails(userName: chat.name),
+                        ),
+                      );
+                    },
+                    child: ChatCard(
+                      name: chat.name,
+                      message: chat.message,
+                      time: chat.time,
+                      type: chat.type,
+                      initial: chat.initial,
+                    ),
                   ),
                 );
               },

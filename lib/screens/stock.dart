@@ -1,3 +1,6 @@
+import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
+import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
+import 'package:ai_customer_service_stock_management_system/screens/stock_manegment.dart';
 import 'package:flutter/material.dart';
 
 class Stock extends StatelessWidget {
@@ -17,10 +20,26 @@ class Stock extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.notifications_outlined, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Notifications()),
+            );
+          },
+        ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.person_outline, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Profile()),
+              );
+            },
+          ),
           Icon(Icons.refresh, color: Colors.white),
-          SizedBox(width: 16),
-          Icon(Icons.grid_view, color: Colors.white),
           SizedBox(width: 16),
         ],
       ),
@@ -111,7 +130,17 @@ class Stock extends StatelessWidget {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StockManagement(
+                        productName: "حذاء رياضي نايك - أحمر (مقاس 42)",
+                        currentStock: 42,
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[900],
                   shape: RoundedRectangleBorder(

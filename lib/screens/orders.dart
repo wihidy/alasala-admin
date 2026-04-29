@@ -1,3 +1,6 @@
+import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
+import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
+import 'package:ai_customer_service_stock_management_system/screens/order_details.dart';
 import 'package:flutter/material.dart';
 
 class Orders extends StatelessWidget {
@@ -9,9 +12,25 @@ class Orders extends StatelessWidget {
       backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
         backgroundColor: Colors.blue[900],
-        leading: Icon(Icons.person_outline, color: Colors.white),
+        leading: IconButton(
+          icon: Icon(Icons.person_outline, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Profile()),
+            );
+          },
+        ),
         actions: [
-          Icon(Icons.notifications_outlined, color: Colors.white),
+          IconButton(
+            icon: Icon(Icons.notifications_outlined, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Notifications()),
+              );
+            },
+          ),
           SizedBox(width: 20),
         ],
         title: Text(
@@ -139,8 +158,15 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const OrderDetails()),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -188,8 +214,9 @@ class OrderCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Color _getTextColor(String s) => s == "PENDING"
       ? Colors.orange[700]!
