@@ -4,9 +4,18 @@ import 'package:ai_customer_service_stock_management_system/screens/login.dart';
 import 'package:ai_customer_service_stock_management_system/screens/orders.dart';
 import 'package:ai_customer_service_stock_management_system/screens/reports.dart';
 import 'package:ai_customer_service_stock_management_system/screens/stock.dart';
+import 'package:ai_customer_service_stock_management_system/supabase_config.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+  );
+
   runApp(const MyApp());
 }
 
