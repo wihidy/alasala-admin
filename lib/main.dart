@@ -34,7 +34,13 @@ class Main extends StatefulWidget {
 class _MainScreenState extends State<Main> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [const Home(), Orders(), Chats(), Stock()];
+  final List<Widget> _screens = [
+    const Home(),
+    Orders(),
+    const Stock(),
+    Chats(),
+    const Reports(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +63,16 @@ class _MainScreenState extends State<Main> {
             label: "Orders",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.store_outlined),
+            label: "Stock",
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
             label: "Chats",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.store_outlined),
-            label: "Stock",
+            icon: Icon(Icons.bar_chart_outlined),
+            label: "Reports",
           ),
         ],
       ),
