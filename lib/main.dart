@@ -2,6 +2,7 @@ import 'package:ai_customer_service_stock_management_system/screens/chats.dart';
 import 'package:ai_customer_service_stock_management_system/screens/home.dart';
 import 'package:ai_customer_service_stock_management_system/screens/login.dart';
 import 'package:ai_customer_service_stock_management_system/screens/orders.dart';
+import 'package:ai_customer_service_stock_management_system/screens/reports.dart';
 import 'package:ai_customer_service_stock_management_system/screens/stock.dart';
 import 'package:flutter/material.dart';
 
