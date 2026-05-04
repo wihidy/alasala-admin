@@ -1,68 +1,142 @@
 import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
 import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
 import 'package:ai_customer_service_stock_management_system/screens/order_details.dart';
+import 'package:ai_customer_service_stock_management_system/supabase_helper.dart';
 import 'package:flutter/material.dart';
 
-class Orders extends StatelessWidget {
+class Orders extends StatefulWidget {
   const Orders({super.key});
 
   @override
+  State<Orders> createState() => _OrdersState();
+}
+
+class _OrdersState extends State<Orders> {
+  final SupabaseHelper _supabaseHelper = SupabaseHelper();
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _allOrders = [];
+  List<Map<String, dynamic>> _filteredOrders = [];
+  String _selectedFilter = 'All';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    try {
+      final orders = await _supabaseHelper.getOrders();
+      setState(() {
+        _allOrders = orders;
+        _filteredOrders = orders;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      debugPrint('Error fetching orders: $e');
+    }
+  }
+
+  void _applyFilters() {
+    setState(() {
+      _filteredOrders = _allOrders.where((order) {
+        final matchesStatus = _selectedFilter == 'All' || 
+            order['status']?.toString().toUpperCase() == _selectedFilter.toUpperCase();
+        
+        final query = _searchController.text.toLowerCase();
+        final matchesSearch =( order['customer_name']?.toString().toLowerCase().contains(query) ?? false ) ||
+           ( order['custom_id']?.toString().toLowerCase().contains(query) ?? false );
+            
+        return matchesStatus && matchesSearch;
+      }).toList();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator(color: Color(0xFF1A3365))),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
+      backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        backgroundColor: Colors.blue[900],
+        backgroundColor: const Color(0xFF1A3365),
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.person_outline, color: Colors.white),
+          icon: const Icon(Icons.notifications_none, color: Colors.white),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const Profile()),
+              MaterialPageRoute(builder: (context) => const Notifications()),
             );
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: Colors.white),
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const Notifications()),
+                MaterialPageRoute(builder: (context) => const Profile()),
               );
             },
+            child: const CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Color(0xFF1A3365)),
+            ),
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 16),
         ],
-        title: Text(
-          "Orders",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+        centerTitle: true,
+        title: Column(
+          children: const [
+            Text(
+              "الطلبات",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "ORDERS",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
         ),
       ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(18),
+            padding: const EdgeInsets.all(18),
             child: Row(
               children: [
-                _buildTab("Confirmed", false),
-                SizedBox(width: 8),
-                _buildTab("Pending", false),
+                _buildTab("Confirmed", _selectedFilter == "Confirmed"),
                 const SizedBox(width: 8),
-                _buildTab("Canceled", false),
-                SizedBox(width: 8),
-                _buildTab("All", true),
+                _buildTab("Pending", _selectedFilter == "Pending"),
+                const SizedBox(width: 8),
+                _buildTab("Canceled", _selectedFilter == "Canceled"),
+                const SizedBox(width: 8),
+                _buildTab("All", _selectedFilter == "All"),
               ],
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
+              controller: _searchController,
+              onChanged: (_) => _applyFilters(),
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 hintText: "Search by order number or customer name",
                 filled: true,
                 fillColor: Colors.white,
@@ -73,52 +147,24 @@ class Orders extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                OrderCard(
-                  orderId: "ORD-001#",
-                  name: "Ahmed Mohammed Al-Amoudi\n(Al-Amoudi)",
-                  time: "2 HOURS AGO",
-                  status: "PENDING",
-                  amount: "1,250",
-                ),
-                SizedBox(height: 12),
-                OrderCard(
-                  orderId: "ORD-002#",
-                  name: "Sarah Abdullah\n(Sarah Abdullah)",
-                  time: "4 HOURS AGO",
-                  status: "CONFIRMED",
-                  amount: "3,400",
-                ),
-                SizedBox(height: 12),
-                OrderCard(
-                  orderId: "ORD-003#",
-                  name: "Yassin Al-Otaibi\n(Otaibi)",
-                  time: "YESTERDAY",
-                  status: "CANCELED",
-                  amount: "2,750",
-                ),
-                SizedBox(height: 40),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: BorderSide.none,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      "Load More..",
-                      style: TextStyle(color: Colors.black),
-                    ),
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _filteredOrders.length,
+              itemBuilder: (context, index) {
+                final order = _filteredOrders[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: OrderCard(
+                    orderId: order['custom_id'] ?? 'ORD-${order['id']}#',
+                    name: order['customer_name'] ?? 'بدون اسم',
+                    time: order['created_at']?.toString().split('T')[0] ?? 'N/A',
+                    status: order['status']?.toString().toUpperCase() ?? 'PENDING',
+                    amount: "${order['total_amount']}",
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
@@ -128,16 +174,27 @@ class Orders extends StatelessWidget {
 
   Widget _buildTab(String title, bool isSelected) {
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.black : Colors.white,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedFilter = title;
+            _applyFilters();
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.black : Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontSize: 12,
+              ),
+            ),
           ),
         ),
       ),

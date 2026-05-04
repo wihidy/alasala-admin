@@ -1,27 +1,70 @@
 import 'package:ai_customer_service_stock_management_system/screens/notifications.dart';
 import 'package:ai_customer_service_stock_management_system/screens/profile.dart';
 import 'package:ai_customer_service_stock_management_system/screens/stock_manegment.dart';
+import 'package:ai_customer_service_stock_management_system/supabase_helper.dart';
 import 'package:flutter/material.dart';
 
-class Stock extends StatelessWidget {
+class Stock extends StatefulWidget {
   const Stock({super.key});
 
   @override
+  State<Stock> createState() => _StockState();
+}
+
+class _StockState extends State<Stock> {
+  final SupabaseHelper _supabaseHelper = SupabaseHelper();
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _allProducts = [];
+  List<Map<String, dynamic>> _filteredProducts = [];
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts();
+  }
+
+  Future<void> _fetchProducts() async {
+    try {
+      final products = await _supabaseHelper.getProducts();
+      setState(() {
+        _allProducts = products;
+        _filteredProducts = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      debugPrint('Error fetching products: $e');
+    }
+  }
+
+  void _filterProducts(String query) {
+    setState(() {
+      _filteredProducts = _allProducts
+          .where((p) =>
+              p['name'].toString().toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator(color: Color(0xFF1A3365))),
+      );
+    }
+
+    final outOfStock = _allProducts.where((p) => (p['stock_quantity'] ?? 0) == 0).length;
+    final lowStock = _allProducts.where((p) => (p['stock_quantity'] ?? 0) > 0 && (p['stock_quantity'] ?? 0) < 10).length;
+
     return Scaffold(
-      backgroundColor: Colors.blueGrey[50],
+      backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        backgroundColor: Colors.blue[900],
-        title: Text(
-          "Stock Management / المخزن",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        backgroundColor: const Color(0xFF1A3365),
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.notifications_outlined, color: Colors.white),
+          icon: const Icon(Icons.notifications_none, color: Colors.white),
           onPressed: () {
             Navigator.push(
               context,
@@ -30,43 +73,69 @@ class Stock extends StatelessWidget {
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.person_outline, color: Colors.white),
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const Profile()),
               );
             },
+            child: const CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Color(0xFF1A3365)),
+            ),
           ),
-          Icon(Icons.refresh, color: Colors.white),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
         ],
+        centerTitle: true,
+        title: Column(
+          children: const [
+            Text(
+              "المخزن",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "STOCK",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
           // Summary Cards
           Container(
-            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            padding: EdgeInsets.all(16),
+            margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+            padding: const EdgeInsets.all(16),
             color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSummaryItem("1", "Out of stock", "نفدت الكمية"),
-                _buildSummaryItem("3", "Low", "منخفض"),
-                _buildSummaryItem("24", "Products", "المنتجات"),
+                _buildSummaryItem("$outOfStock", "Out of stock", "نفدت الكمية"),
+                _buildSummaryItem("$lowStock", "Low", "منخفض"),
+                _buildSummaryItem("${_allProducts.length}", "Products", "المنتجات"),
               ],
             ),
           ),
 
           // Search Bar
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: TextField(
+              controller: _searchController,
+              onChanged: _filterProducts,
               decoration: InputDecoration(
                 hintText: "Search product / البحث عن منتج ...",
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -79,88 +148,62 @@ class Stock extends StatelessWidget {
 
           // Filters
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 _buildFilterChip("All", true),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 _buildFilterChip("Stock", false),
               ],
             ),
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
 
           // Products List
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                StockProductCard(
-                  name: "زعفران ملكي\nSaffron Royal Special",
-                  stockStatus: "Low / منخفض",
-                  quantity: "12 g / جرام",
-                  percentage: "24%",
-                  color: Colors.orange,
-                ),
-                SizedBox(height: 12),
-                StockProductCard(
-                  name: "بخور الأصالة\nAl-Asala Oud Bakhoor",
-                  stockStatus: "Available / متوفر",
-                  quantity: "85 units / وحدة",
-                  percentage: "82%",
-                  color: Colors.green,
-                ),
-                SizedBox(height: 12),
-                StockProductCard(
-                  name: "دهن عود\nOud Sayufi Oil",
-                  stockStatus: "Low / منخفض",
-                  quantity: "45 ml / مل",
-                  percentage: "31%",
-                  color: Colors.orange,
-                ),
-              ],
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _filteredProducts.length,
+              itemBuilder: (context, index) {
+                final product = _filteredProducts[index];
+                final qty = product['stock_quantity'] ?? 0;
+                final status = qty == 0 ? "نفدت" : (qty < 10 ? "منخفض" : "متوفر");
+                final color = qty == 0 ? Colors.red : (qty < 10 ? Colors.orange : Colors.green);
+                final percent = (qty / 100).clamp(0.0, 1.0) * 100;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StockManagement(
+                            productId: product['id'],
+                            productName: product['name'] ?? 'بدون اسم',
+                            currentStock: product['stock_quantity'] ?? 0,
+                          ),
+                        ),
+                      );
+                      if (result == true) {
+                        _fetchProducts(); // Refresh the list if update was successful
+                      }
+                    },
+                    child: StockProductCard(
+                      name: product['name'] ?? 'بدون اسم',
+                      stockStatus: status,
+                      quantity: "$qty وحدة",
+                      percentage: "${percent.toInt()}%",
+                      color: color,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
-          // Update Stock Button
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const StockManagement(
-                        productName: "حذاء رياضي نايك - أحمر (مقاس 42)",
-                        currentStock: 42,
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[900],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Update Stock / تحديث المخزون",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    SizedBox(width: 10),
-                    Icon(Icons.swap_horiz, color: Colors.white),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Update Stock Button (Optional if needed)
         ],
       ),
     );

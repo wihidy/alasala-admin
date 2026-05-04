@@ -36,12 +36,12 @@ class OrderDetails extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Customer Info Section
-            _buildSectionHeader('Customer Info / بيانات العميل', Icons.person_outline),
+            _buildSectionHeader('Customer Info / بيانات العميل', Icons.person_outlined),
             _buildCustomerInfoCard(),
             const SizedBox(height: 16),
 
             // Items Section
-            _buildSectionHeader('Items / المنتجات', Icons.shopping_bag_outline, badge: '3 منتجات'),
+            _buildSectionHeader('Items / المنتجات', Icons.shopping_bag_outlined, badge: '3 منتجات'),
             _buildItemsCard(),
             const SizedBox(height: 16),
 
@@ -278,10 +278,10 @@ class OrderDetails extends StatelessWidget {
         color: const Color(0xFF1A3365),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Column(
+    child: Column(
         children: [
           _buildSummaryRow('2,900 ج', 'Subtotal / المجموع الفرعي'),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           _buildSummaryRow('50 ج', 'Delivery Fee / رسوم التوصيل'),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16),

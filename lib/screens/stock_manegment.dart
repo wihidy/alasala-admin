@@ -1,11 +1,14 @@
+import 'package:ai_customer_service_stock_management_system/supabase_helper.dart';
 import 'package:flutter/material.dart';
 
 class StockManagement extends StatefulWidget {
+  final int productId;
   final String productName;
   final int currentStock;
 
   const StockManagement({
     super.key,
+    required this.productId,
     required this.productName,
     required this.currentStock,
   });
@@ -15,6 +18,8 @@ class StockManagement extends StatefulWidget {
 }
 
 class _StockManagementState extends State<StockManagement> {
+  final SupabaseHelper _supabaseHelper = SupabaseHelper();
+  bool _isSaving = false;
   int _adjustment = 12;
   String _selectedReason = 'شحنة جديدة (New Stock)';
   final TextEditingController _noteController = TextEditingController();
@@ -45,10 +50,10 @@ class _StockManagementState extends State<StockManagement> {
                   children: [
                     const Text(
                       'تحديث المخزون',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Color(0 dream: Color(0xFF1A3365)),
+                        color: Color(0xFF1A3365),
                       ),
                     ),
                     Text(
@@ -249,30 +254,51 @@ class _StockManagementState extends State<StockManagement> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: _isSaving
+                    ? null
+                    : () async {
+                        setState(() => _isSaving = true);
+                        try {
+                          final newQty = widget.currentStock + _adjustment;
+                          await _supabaseHelper.updateStock(
+                            widget.productId,
+                            newQty,
+                          );
+                          if (mounted) {
+                            Navigator.pop(context, true); // Return true to indicate success
+                          }
+                        } catch (e) {
+                          setState(() => _isSaving = false);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error updating stock: $e')),
+                            );
+                          }
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1A3365),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check_circle_outline, color: Color(0xFFD4AF37)),
-                    SizedBox(width: 12),
-                    Text(
-                      'SAVE CHANGES / حفظ التغييرات',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                child: _isSaving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Color(0xFFD4AF37)),
+                          SizedBox(width: 12),
+                          Text(
+                            'SAVE CHANGES / حفظ التغييرات',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
             const SizedBox(height: 16),
