@@ -2,7 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class LanguageManager {
-  static final ValueNotifier<Locale> localeNotifier = ValueNotifier(const Locale('ar'));
+  static final ValueNotifier<Locale> localeNotifier = ValueNotifier(
+    const Locale('ar'),
+  );
 
   static void setLocale(String languageCode) {
     localeNotifier.value = Locale(languageCode);
@@ -53,7 +55,10 @@ class _SettingsState extends State<Settings> {
             body: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildSectionHeader(isArabic ? "التفضيلات العامة" : "General Preferences", textColor),
+                _buildSectionHeader(
+                  isArabic ? "التفضيلات العامة" : "General Preferences",
+                  textColor,
+                ),
                 const SizedBox(height: 12),
                 _buildSettingsCard([
                   _buildDropdownTile(
@@ -84,7 +89,10 @@ class _SettingsState extends State<Settings> {
                   ),
                 ], cardColor),
                 const SizedBox(height: 24),
-                _buildSectionHeader(isArabic ? "التنبيهات" : "Notifications", textColor),
+                _buildSectionHeader(
+                  isArabic ? "التنبيهات" : "Notifications",
+                  textColor,
+                ),
                 const SizedBox(height: 12),
                 _buildSettingsCard([
                   _buildSwitchTile(
@@ -96,14 +104,29 @@ class _SettingsState extends State<Settings> {
                   ),
                 ], cardColor),
                 const SizedBox(height: 24),
-                _buildSectionHeader(isArabic ? "النظام والدعم" : "Support & System", textColor),
+                _buildSectionHeader(
+                  isArabic ? "النظام والدعم" : "Support & System",
+                  textColor,
+                ),
                 const SizedBox(height: 12),
                 _buildSettingsCard([
-                  _buildActionTile(isArabic ? "حول التطبيق" : "About App", Icons.info_outline, textColor),
+                  _buildActionTile(
+                    isArabic ? "حول التطبيق" : "About App",
+                    Icons.info_outline,
+                    textColor,
+                  ),
                   _buildDivider(),
-                  _buildActionTile(isArabic ? "تواصل معنا" : "Contact Us", Icons.headset_mic_outlined, textColor),
+                  _buildActionTile(
+                    isArabic ? "تواصل معنا" : "Contact Us",
+                    Icons.headset_mic_outlined,
+                    textColor,
+                  ),
                   _buildDivider(),
-                  _buildActionTile(isArabic ? "سياسة الخصوصية" : "Privacy Policy", Icons.security_outlined, textColor),
+                  _buildActionTile(
+                    isArabic ? "سياسة الخصوصية" : "Privacy Policy",
+                    Icons.security_outlined,
+                    textColor,
+                  ),
                 ], cardColor),
                 const SizedBox(height: 40),
                 Center(
@@ -126,7 +149,11 @@ class _SettingsState extends State<Settings> {
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: Text(
         title,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor),
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: textColor,
+        ),
       ),
     );
   }
@@ -136,28 +163,59 @@ class _SettingsState extends State<Settings> {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10),
+        ],
       ),
       child: Column(children: children),
     );
   }
 
-  Widget _buildDropdownTile(String title, String value, IconData icon, List<String> items, ValueChanged<String?> onChanged, Color textColor) {
+  Widget _buildDropdownTile(
+    String title,
+    String value,
+    IconData icon,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+    Color textColor,
+  ) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFD4AF37)),
       title: Text(title, style: TextStyle(fontSize: 15, color: textColor)),
       trailing: DropdownButton<String>(
         value: value,
         underline: const SizedBox(),
-        dropdownColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E1E1E) : Colors.white,
-        icon: const Icon(Icons.keyboard_arrow_down, size: 20, color: Colors.grey),
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(fontSize: 13, color: textColor)))).toList(),
+        dropdownColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1E1E1E)
+            : Colors.white,
+        icon: const Icon(
+          Icons.keyboard_arrow_down,
+          size: 20,
+          color: Colors.grey,
+        ),
+        items: items
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(
+                  e,
+                  style: TextStyle(fontSize: 13, color: textColor),
+                ),
+              ),
+            )
+            .toList(),
         onChanged: onChanged,
       ),
     );
   }
 
-  Widget _buildSwitchTile(String title, bool value, IconData icon, ValueChanged<bool> onChanged, Color textColor) {
+  Widget _buildSwitchTile(
+    String title,
+    bool value,
+    IconData icon,
+    ValueChanged<bool> onChanged,
+    Color textColor,
+  ) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFD4AF37)),
       title: Text(title, style: TextStyle(fontSize: 15, color: textColor)),
@@ -173,7 +231,11 @@ class _SettingsState extends State<Settings> {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFD4AF37)),
       title: Text(title, style: TextStyle(fontSize: 15, color: textColor)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 14,
+        color: Colors.grey,
+      ),
       onTap: () {},
     );
   }

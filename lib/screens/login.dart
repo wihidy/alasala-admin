@@ -1,5 +1,6 @@
 import 'package:ai_customer_service_stock_management_system/main.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -14,18 +15,41 @@ class _LoginState extends State<Login> {
 
   bool _isLoading = false;
 
-  void _login() {
+  // ✅ وحطّ دي بدلها
+  void _login() async {
+    if (_email.text.isEmpty || _password.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('من فضلك ادخل الإيميل وكلمة المرور')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
-    Future.delayed(Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() => _isLoading = false);
+    try {
+      final response = await Supabase.instance.client.auth.signInWithPassword(
+        email: _email.text.trim(),
+        password: _password.text.trim(),
+      );
+
+      if (response.user != null && mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const Main()),
         );
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ الإيميل أو كلمة المرور غلط!'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override

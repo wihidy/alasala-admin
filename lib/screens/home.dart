@@ -26,7 +26,7 @@ class _HomeState extends State<Home> {
     try {
       final reports = await _supabaseHelper.getDailyReports();
       final orders = await _supabaseHelper.getOrders();
-      
+
       setState(() {
         if (reports.isNotEmpty) {
           _todayReport = reports.first;
@@ -44,7 +44,9 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF1A3365))),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF1A3365)),
+        ),
       );
     }
 
@@ -60,8 +62,8 @@ class _HomeState extends State<Home> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.notifications_none, color: Colors.white),
-          onPressed: ()  {
-             Navigator.push(
+          onPressed: () {
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Notifications()),
             );
@@ -287,16 +289,18 @@ class _HomeState extends State<Home> {
               if (_recentOrders.isEmpty)
                 const Center(child: Text("لا توجد طلبات مؤخراً"))
               else
-                ..._recentOrders.map((order) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _buildRecentOrder(
-                    order['customer_name'] ?? 'بدون اسم',
-                    order['custom_id'] ?? 'ORD-${order['id']}',
-                    '${order['total_amount']} ج',
-                    order['status'] ?? 'PENDING',
-                    _getStatusColor(order['status']),
+                ..._recentOrders.map(
+                  (order) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _buildRecentOrder(
+                      order['customer_name'] ?? 'بدون اسم',
+                      order['custom_id'] ?? 'ORD-${order['id']}',
+                      '${order['total_amount']} ج',
+                      order['status'] ?? 'PENDING',
+                      _getStatusColor(order['status']),
+                    ),
                   ),
-                )),
+                ),
             ],
           ),
         ),
@@ -318,7 +322,13 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Widget _buildQuickActionItem(BuildContext context, String title, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildQuickActionItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -327,18 +337,26 @@ class _HomeState extends State<Home> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, color: color, size: 24),
             ),
             const SizedBox(height: 8),
-            Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -464,7 +482,7 @@ class LineChartPainter extends CustomPainter {
         size.width * 0.3,
         size.height * 0.2,
         size.width * 0.5,
-        
+
         size.height * 0.65,
       )
       ..quadraticBezierTo(

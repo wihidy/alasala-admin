@@ -58,10 +58,7 @@ class _StockManagementState extends State<StockManagement> {
                     ),
                     Text(
                       widget.productName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -150,16 +147,17 @@ class _StockManagementState extends State<StockManagement> {
                 child: DropdownButton<String>(
                   value: _selectedReason,
                   isExpanded: true,
-                  items: [
-                    'شحنة جديدة (New Stock)',
-                    'مرتجع (Returned)',
-                    'تالف (Damaged)',
-                  ].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items:
+                      [
+                        'شحنة جديدة (New Stock)',
+                        'مرتجع (Returned)',
+                        'تالف (Damaged)',
+                      ].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
                   onChanged: (value) {
                     setState(() {
                       _selectedReason = value!;
@@ -234,7 +232,10 @@ class _StockManagementState extends State<StockManagement> {
                   ),
                   const SizedBox(width: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1A3365),
                       borderRadius: BorderRadius.circular(20),
@@ -265,13 +266,18 @@ class _StockManagementState extends State<StockManagement> {
                             newQty,
                           );
                           if (mounted) {
-                            Navigator.pop(context, true); // Return true to indicate success
+                            Navigator.pop(
+                              context,
+                              true,
+                            ); // Return true to indicate success
                           }
                         } catch (e) {
                           setState(() => _isSaving = false);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error updating stock: $e')),
+                              SnackBar(
+                                content: Text('Error updating stock: $e'),
+                              ),
                             );
                           }
                         }
@@ -287,7 +293,10 @@ class _StockManagementState extends State<StockManagement> {
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check_circle_outline, color: Color(0xFFD4AF37)),
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: Color(0xFFD4AF37),
+                          ),
                           SizedBox(width: 12),
                           Text(
                             'SAVE CHANGES / حفظ التغييرات',

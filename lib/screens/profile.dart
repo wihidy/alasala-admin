@@ -1,5 +1,7 @@
-import 'package:ai_customer_service_stock_management_system/screens/settings.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ai_customer_service_stock_management_system/screens/login.dart';
 import 'package:flutter/material.dart';
+import 'package:ai_customer_service_stock_management_system/screens/settings.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -10,11 +12,17 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controllers for editing
-  final TextEditingController _nameController = TextEditingController(text: "فارس");
-  final TextEditingController _usernameController = TextEditingController(text: "fares_admin");
-  final TextEditingController _passwordController = TextEditingController(text: "********");
+  final TextEditingController _nameController = TextEditingController(
+    text: "فارس",
+  );
+  final TextEditingController _usernameController = TextEditingController(
+    text: "fares_admin",
+  );
+  final TextEditingController _passwordController = TextEditingController(
+    text: "********",
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +66,11 @@ class _ProfileState extends State<Profile> {
                   const CircleAvatar(
                     radius: 60,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 80, color: Color(0xFF1A3365)),
+                    child: Icon(
+                      Icons.person,
+                      size: 80,
+                      color: Color(0xFF1A3365),
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -66,19 +78,36 @@ class _ProfileState extends State<Profile> {
                       color: Color(0xFFD4AF37),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 32),
 
               // Form Fields
-              _buildTextField("الاسم الكامل", _nameController, Icons.person_outline),
+              _buildTextField(
+                "الاسم الكامل",
+                _nameController,
+                Icons.person_outline,
+              ),
               const SizedBox(height: 16),
-              _buildTextField("اسم المستخدم", _usernameController, Icons.alternate_email),
+              _buildTextField(
+                "اسم المستخدم",
+                _usernameController,
+                Icons.alternate_email,
+              ),
               const SizedBox(height: 16),
-              _buildTextField("كلمة المرور", _passwordController, Icons.lock_outline, isPassword: true),
-              
+              _buildTextField(
+                "كلمة المرور",
+                _passwordController,
+                Icons.lock_outline,
+                isPassword: true,
+              ),
+
               const SizedBox(height: 40),
 
               // Save Button
@@ -86,12 +115,31 @@ class _ProfileState extends State<Profile> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('تم تحديث البيانات بنجاح')),
-                      );
-                      Navigator.pop(context);
+                      try {
+                        if (_passwordController.text != '********') {
+                          await Supabase.instance.client.auth.updateUser(
+                            UserAttributes(password: _passwordController.text),
+                          );
+                        }
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('✅ تم تحديث البيانات بنجاح'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          Navigator.pop(context);
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('خطأ: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -102,22 +150,37 @@ class _ProfileState extends State<Profile> {
                   ),
                   child: const Text(
                     "حفظ التغييرات",
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Logout Button
               TextButton.icon(
-                onPressed: () {
-                  // Handle logout
+                onPressed: () async {
+                  await Supabase.instance.client.auth.signOut();
+                  if (mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const Login()),
+                      (route) => false,
+                    );
+                  }
                 },
+
                 icon: const Icon(Icons.logout, color: Colors.red),
                 label: const Text(
                   "تسجيل الخروج",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -127,13 +190,21 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {bool isPassword = false}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    bool isPassword = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A3365)),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1A3365),
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -148,7 +219,10 @@ class _ProfileState extends State<Profile> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
