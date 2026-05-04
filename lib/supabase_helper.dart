@@ -3,13 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseHelper {
   final supabase = Supabase.instance.client;
 
-  // جلب جميع المنتجات من جدول products
+  // --- Products & Stock ---
   Future<List<Map<String, dynamic>>> getProducts() async {
-    final response = await supabase.from('products').select();
-    return response;
+    return await supabase.from('products').select().order('name', ascending: true);
   }
 
-  // تحديث كمية المخزون
   Future<void> updateStock(int productId, int newQuantity) async {
     await supabase
         .from('products')
@@ -17,20 +15,57 @@ class SupabaseHelper {
         .eq('id', productId);
   }
 
-  // جلب الطلبات الأخيرة
+  // --- Orders ---
   Future<List<Map<String, dynamic>>> getOrders() async {
-    final response = await supabase
+    return await supabase
         .from('orders')
         .select('*, order_items(*)')
         .order('created_at', ascending: false);
-    return response;
   }
 
-  // تسجيل دخول الأدمن
+  Future<void> updateOrderStatus(int orderId, String status) async {
+    await supabase.from('orders').update({'status': status}).eq('id', orderId);
+  }
+
+  // --- Customers ---
+  Future<List<Map<String, dynamic>>> getCustomers() async {
+    return await supabase.from('customers').select().order('last_seen', ascending: false);
+  }
+
+  Future<Map<String, dynamic>> getCustomerDetails(String customerId) async {
+    return await supabase.from('customers').select().eq('id', customerId).single();
+  }
+
+  // --- Reports & Analytics ---
+  Future<List<Map<String, dynamic>>> getDailyReports() async {
+    return await supabase
+        .from('daily_reports')
+        .select()
+        .order('report_date', ascending: false)
+        .limit(7);
+  }
+
+  // --- Notifications ---
+  Future<List<Map<String, dynamic>>> getNotifications() async {
+    return await supabase
+        .from('notifications')
+        .select()
+        .order('created_at', ascending: false);
+  }
+
+  Future<void> markNotificationAsRead(int id) async {
+    await supabase.from('notifications').update({'is_read': true}).eq('id', id);
+  }
+
+  // --- Authentication ---
   Future<AuthResponse> signIn(String email, String password) async {
     return await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
+  }
+
+  Future<void> signOut() async {
+    await supabase.auth.signOut();
   }
 }
