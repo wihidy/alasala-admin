@@ -5,7 +5,10 @@ class SupabaseHelper {
 
   // --- Products & Stock ---
   Future<List<Map<String, dynamic>>> getProducts() async {
-    return await supabase.from('products').select().order('name', ascending: true);
+    return await supabase
+        .from('products')
+        .select()
+        .order('name', ascending: true);
   }
 
   Future<void> updateStock(int productId, int newQuantity) async {
@@ -29,11 +32,18 @@ class SupabaseHelper {
 
   // --- Customers ---
   Future<List<Map<String, dynamic>>> getCustomers() async {
-    return await supabase.from('customers').select().order('last_seen', ascending: false);
+    return await supabase
+        .from('customers')
+        .select()
+        .order('created_at', ascending: false);
   }
 
   Future<Map<String, dynamic>> getCustomerDetails(String customerId) async {
-    return await supabase.from('customers').select().eq('id', customerId).single();
+    return await supabase
+        .from('customers')
+        .select()
+        .eq('id', customerId)
+        .single();
   }
 
   // --- Reports & Analytics ---

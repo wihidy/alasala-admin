@@ -10,7 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     await Supabase.initialize(
       url: SupabaseConfig.url,
@@ -19,7 +19,8 @@ void main() async {
     debugPrint("✅ Supabase Initialized Successfully");
   } catch (e) {
     debugPrint("❌ Supabase Initialization Error: $e");
-  }  runApp(const MyApp());
+  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
